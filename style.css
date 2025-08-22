@@ -140,3 +140,51 @@ h1 {
     justify-content: space-around;
     font-weight: bold;
 }
+
+#open-another-pack-btn {
+    display: none;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    font-size: 1.2em;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin: 2rem auto;
+}
+
+#open-another-pack-btn:hover {
+    background-color: #218838;
+}
+
+#gallery-container {
+    margin-top: 3rem;
+}
+
+#gallery {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.gallery-card {
+    width: 150px;
+    border-radius: 5px;
+    padding: 0.5rem;
+    text-align: center;
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.gallery-card img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 4px;
+}
+
+.gallery-card h3 {
+    font-size: 1em;
+    margin: 0.5rem 0;
+}

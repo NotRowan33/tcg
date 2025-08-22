@@ -146,6 +146,44 @@ function openPack() {
 
 const packOpener = document.getElementById('pack-opener');
 const cardContainer = document.getElementById('card-container');
+const openAnotherPackBtn = document.getElementById('open-another-pack-btn');
+const gallery = document.getElementById('gallery');
+
+let collection = [];
+
+function loadCollection() {
+    const savedCollection = localStorage.getItem('cardCollection');
+    if (savedCollection) {
+        collection = JSON.parse(savedCollection);
+    }
+}
+
+function saveCollection() {
+    localStorage.setItem('cardCollection', JSON.stringify(collection));
+}
+
+function addToCollection(pack) {
+    pack.forEach(card => {
+        if (!collection.find(c => c.name === card.name)) {
+            collection.push(card);
+        }
+    });
+    saveCollection();
+    displayGallery();
+}
+
+function displayGallery() {
+    gallery.innerHTML = '';
+    collection.forEach(card => {
+        const cardElement = document.createElement('div');
+        cardElement.classList.add('gallery-card', card.rarity);
+        cardElement.innerHTML = `
+            <img src="${card.image}" alt="${card.name}">
+            <h3>${card.name}</h3>
+        `;
+        gallery.appendChild(cardElement);
+    });
+}
 
 function displayCards(pack) {
     cardContainer.innerHTML = '';
@@ -177,9 +215,21 @@ function displayCards(pack) {
 packOpener.addEventListener('click', () => {
     packOpener.classList.add('opening');
     const newPack = openPack();
+    addToCollection(newPack);
 
     setTimeout(() => {
         displayCards(newPack);
         packOpener.style.display = 'none'; // Hide the pack after opening
+        openAnotherPackBtn.style.display = 'block'; // Show the "Open Another" button
     }, 1000); // Wait for pack animation to finish
 });
+
+openAnotherPackBtn.addEventListener('click', () => {
+    packOpener.style.display = 'block';
+    packOpener.classList.remove('opening');
+    cardContainer.innerHTML = '';
+    openAnotherPackBtn.style.display = 'none';
+});
+
+loadCollection();
+displayGallery();
