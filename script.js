@@ -116,12 +116,15 @@ function saveCollection() {
 }
 
 function addToCollection(pack) {
+    const newlyAdded = [];
     pack.forEach(card => {
         if (!collection.find(c => c.set_number === card.set_number)) {
             collection.push(card);
+            newlyAdded.push(card);
         }
     });
     saveCollection();
+    return newlyAdded;
 }
 
 function displayGallery() {
@@ -165,14 +168,17 @@ function displayGallery() {
     });
 }
 
-function displayCards(pack) {
+function displayCards(pack, newlyCollected = []) {
     cardContainer.innerHTML = '';
     pack.forEach((card, index) => {
         const cardElement = document.createElement('div');
         cardElement.classList.add('card', card.rarity);
         cardElement.style.animationDelay = `${index * 0.1}s`;
 
+        const isNew = newlyCollected.some(newCard => newCard.set_number === card.set_number);
+
         cardElement.innerHTML = `
+            ${isNew ? '<div class="new-tag">NEW</div>' : ''}
             <div class="card-header">
                 <h2>${card.name}</h2>
             </div>
@@ -195,10 +201,10 @@ function displayCards(pack) {
 packOpener.addEventListener('click', () => {
     packOpener.classList.add('opening');
     const newPack = openPack();
-    addToCollection(newPack);
+    const newlyCollected = addToCollection(newPack);
 
     setTimeout(() => {
-        displayCards(newPack);
+        displayCards(newPack, newlyCollected);
         packOpener.style.display = 'none'; // Hide the pack after opening
         openAnotherPackBtn.style.display = 'block'; // Show the "Open Another" button
     }, 1000); // Wait for pack animation to finish
