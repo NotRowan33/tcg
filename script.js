@@ -159,14 +159,22 @@ const closeBtn = document.querySelector('.close-btn');
 const settingsModal = document.getElementById('settings-modal');
 const settingsBtn = document.getElementById('settings-btn');
 const closeSettingsBtn = settingsModal.querySelector('.close-btn');
+const deckBuilderModal = document.getElementById('deck-builder-modal');
+const deckBuilderBtn = document.getElementById('deck-builder-btn');
+const closeDeckBuilderBtn = deckBuilderModal.querySelector('.close-btn');
 const themeSwitcher = document.getElementById('theme-switcher');
 const themeButtons = themeSwitcher.querySelectorAll('.theme-btn');
 const resetBtn = document.getElementById('reset-btn');
 const resetConfirmation = document.getElementById('reset-confirmation');
 const resetYesBtn = document.getElementById('reset-yes-btn');
 const resetNoBtn = document.getElementById('reset-no-btn');
+const deckBuilderCollection = document.getElementById('deck-builder-collection').querySelector('.card-list');
+const deckBuilderDeck = document.getElementById('deck-builder-deck').querySelector('.card-list');
+const deckCount = document.getElementById('deck-count');
+const saveDeckBtn = document.getElementById('save-deck-btn');
 
 let collection = {};
+let deck = [];
 
 function loadCollection() {
     const savedCollection = localStorage.getItem('cardCollection');
@@ -175,6 +183,66 @@ function loadCollection() {
     } else {
         collection = {};
     }
+}
+
+function loadDeck() {
+    const savedDeck = localStorage.getItem('playerDeck');
+    if (savedDeck) {
+        deck = JSON.parse(savedDeck);
+    } else {
+        deck = [];
+    }
+}
+
+function saveDeck() {
+    localStorage.setItem('playerDeck', JSON.stringify(deck));
+    alert('Deck saved!');
+}
+
+function displayDeckBuilder() {
+    deckBuilderCollection.innerHTML = '';
+    deckBuilderDeck.innerHTML = '';
+    deckCount.textContent = deck.length;
+
+    const collectedCards = Object.keys(collection).map(set_number => {
+        return cards.find(card => card.set_number == set_number);
+    });
+
+    collectedCards.forEach(card => {
+        const cardElement = document.createElement('div');
+        cardElement.classList.add('card', card.rarity);
+
+        const ownedCount = collection[card.set_number];
+        const inDeckCount = deck.filter(deckCardId => deckCardId === card.set_number).length;
+        const canAdd = deck.length < 20 && inDeckCount < ownedCount;
+
+        cardElement.innerHTML = `
+            <div class="quantity-tag">x${ownedCount}</div>
+            <div class="card-header">
+                <h2>${card.name}</h2>
+            </div>
+            <img class="card-image" src="${card.image}" alt="${card.name}">
+            <button class="add-to-deck-btn" data-set-number="${card.set_number}" ${canAdd ? '' : 'disabled'}>Add</button>
+        `;
+        deckBuilderCollection.appendChild(cardElement);
+    });
+
+    deck.forEach((cardId, index) => {
+        const card = cards.find(c => c.set_number === cardId);
+        const cardElement = document.createElement('div');
+        cardElement.classList.add('card', card.rarity);
+        cardElement.innerHTML = `
+            <div class="card-header">
+                <h2>${card.name}</h2>
+            </div>
+            <img class="card-image" src="${card.image}" alt="${card.name}">
+            <button class="remove-from-deck-btn" data-deck-index="${index}">Remove</button>
+        `;
+        deckBuilderDeck.appendChild(cardElement);
+    });
+
+    // Add event listeners after rendering
+    addDeckBuilderEventListeners();
 }
 
 function saveCollection() {
@@ -305,6 +373,20 @@ window.addEventListener('click', (event) => {
     if (event.target == settingsModal) {
         settingsModal.style.display = 'none';
     }
+    if (event.target == deckBuilderModal) {
+        deckBuilderModal.style.display = 'none';
+    }
+});
+
+deckBuilderBtn.addEventListener('click', () => {
+    deckBuilderModal.style.display = 'block';
+    displayDeckBuilder();
+});
+
+saveDeckBtn.addEventListener('click', saveDeck);
+
+closeDeckBuilderBtn.addEventListener('click', () => {
+    deckBuilderModal.style.display = 'none';
 });
 
 settingsBtn.addEventListener('click', () => {
@@ -337,7 +419,26 @@ function loadTheme() {
     }
 }
 
+function addDeckBuilderEventListeners() {
+    document.querySelectorAll('.add-to-deck-btn').forEach(button => {
+        button.addEventListener('click', (e) => {
+            const setNumber = parseInt(e.target.dataset.setNumber);
+            deck.push(setNumber);
+            displayDeckBuilder();
+        });
+    });
+
+    document.querySelectorAll('.remove-from-deck-btn').forEach(button => {
+        button.addEventListener('click', (e) => {
+            const deckIndex = parseInt(e.target.dataset.deckIndex);
+            deck.splice(deckIndex, 1);
+            displayDeckBuilder();
+        });
+    });
+}
+
 loadTheme();
+loadDeck();
 
 resetBtn.addEventListener('click', () => {
     resetConfirmation.classList.remove('hidden');

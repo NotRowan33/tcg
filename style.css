@@ -292,6 +292,69 @@ h1 {
     z-index: 2;
 }
 
+#deck-builder-btn {
+    background-color: var(--secondary-color);
+}
+
+.deck-builder-container {
+    display: flex;
+    gap: 2rem;
+    margin-top: 1rem;
+}
+
+.deck-panel {
+    flex: 1;
+    border: 1px solid var(--accent-color);
+    padding: 1rem;
+    height: 60vh;
+    overflow-y: auto;
+    background-color: rgba(0,0,0,0.05);
+    border-radius: 5px;
+}
+
+.deck-panel h3 {
+    margin-top: 0;
+    border-bottom: 2px solid var(--accent-color);
+    padding-bottom: 0.5rem;
+}
+
+.deck-panel .card-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: center;
+}
+
+.deck-panel .card {
+    width: 150px;
+    height: auto;
+    cursor: pointer;
+}
+
+.deck-panel .card .card-image {
+    height: 100px;
+}
+
+.deck-panel .card .card-body {
+    padding: 0.5rem;
+}
+
+#save-deck-btn {
+    margin-top: 1rem;
+    padding: 10px 30px;
+    font-size: 1.2em;
+    background-color: var(--primary-color);
+    color: var(--white-color);
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#save-deck-btn:hover {
+    background-color: var(--secondary-color);
+}
+
 #theme-switcher {
     margin-top: 2rem;
 }
