@@ -18,6 +18,7 @@
     <button id="open-another-pack-btn">Return to Menu</button>
     <button id="open-collection-btn">My Collection</button>
     <button id="deck-builder-btn">Deck Builder</button>
+    <button id="battle-btn">Battle!</button>
     <div id="collection-modal" class="modal">
         <div class="modal-content">
             <span class="close-btn">&times;</span>
@@ -61,6 +62,36 @@
                 </div>
             </div>
             <button id="save-deck-btn">Save Deck</button>
+        </div>
+    </div>
+    <div id="battle-screen">
+        <div id="opponent-zone" class="player-zone">
+            <div class="hand-container"></div>
+            <div class="bench-container"></div>
+            <div class="player-info">
+                <div class="deck-info">Deck: <span id="opponent-deck-count">20</span></div>
+                <div class="health-info">Health: <span id="opponent-health">100</span></div>
+            </div>
+        </div>
+
+        <div id="game-info-bar">
+            <span id="turn-indicator">Player's Turn</span>
+            <button id="end-turn-btn">End Turn</button>
+        </div>
+
+        <div id="player-zone" class="player-zone">
+            <div class="player-info">
+                <div class="deck-info">Deck: <span id="player-deck-count">20</span></div>
+                <div class="health-info">Health: <span id="player-health">100</span></div>
+            </div>
+            <div class="bench-container"></div>
+            <div class="hand-container"></div>
+        </div>
+    </div>
+    <div id="game-over-modal" class="modal">
+        <div class="modal-content">
+            <h2 id="game-over-message"></h2>
+            <button id="game-over-ok-btn">OK</button>
         </div>
     </div>
     <script src="script.js"></script>

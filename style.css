@@ -126,6 +126,11 @@ h1 {
     box-shadow: 0 8px 16px rgba(0,0,0,0.2);
 }
 
+.card.selected {
+    border-color: #ffc107;
+    box-shadow: 0 0 15px #ffc107;
+}
+
 .card-header {
     background-color: var(--accent-color);
     color: var(--white-color);
@@ -149,6 +154,12 @@ h1 {
     flex-grow: 1;
 }
 
+.card-ability {
+    font-size: 0.8em;
+    font-style: italic;
+    padding: 0.5rem;
+}
+
 .card-footer {
     background-color: var(--accent-color);
     color: var(--white-color);
@@ -170,7 +181,7 @@ h1 {
     font-weight: bold;
 }
 
-#open-another-pack-btn, #open-collection-btn {
+#open-another-pack-btn, #open-collection-btn, #deck-builder-btn {
     background-color: var(--primary-color);
     color: var(--white-color);
     border: none;
@@ -184,7 +195,7 @@ h1 {
     letter-spacing: 1px;
 }
 
-#open-another-pack-btn:hover, #open-collection-btn:hover {
+#open-another-pack-btn:hover, #open-collection-btn:hover, #deck-builder-btn:hover {
     background-color: var(--secondary-color);
 }
 
@@ -292,10 +303,6 @@ h1 {
     z-index: 2;
 }
 
-#deck-builder-btn {
-    background-color: var(--secondary-color);
-}
-
 .deck-builder-container {
     display: flex;
     gap: 2rem;
@@ -399,4 +406,125 @@ h1 {
 
 #reset-confirmation p {
     margin: 1rem 0;
+}
+
+.damage-text, .heal-text {
+    position: absolute;
+    font-size: 2em;
+    font-weight: bold;
+    animation: floatUp 1s forwards;
+    pointer-events: none;
+    z-index: 300;
+}
+
+.damage-text { color: red; }
+.heal-text { color: green; }
+
+@keyframes floatUp {
+    from { transform: translateY(0); opacity: 1; }
+    to { transform: translateY(-50px); opacity: 0; }
+}
+
+@keyframes lunge {
+    50% { transform: translateY(-20px); }
+    100% { transform: translateY(0); }
+}
+
+@keyframes shake-damage {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+    20%, 40%, 60%, 80% { transform: translateX(5px); }
+}
+
+@keyframes defeat {
+    to { transform: translateY(50px) rotate(90deg); opacity: 0; }
+}
+
+.card.attacking {
+    animation: lunge 0.5s ease-in-out;
+}
+
+.card.damaged {
+    animation: shake-damage 0.3s linear;
+}
+
+.card.defeated {
+    animation: defeat 0.5s forwards;
+}
+
+#game-over-modal .modal-content {
+    max-width: 400px;
+    text-align: center;
+}
+
+#game-over-ok-btn {
+    padding: 10px 30px;
+    font-size: 1.2em;
+    margin-top: 1rem;
+}
+
+/* --- Battle Screen --- */
+#battle-screen {
+    display: none; /* Hidden by default */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: var(--background-color);
+    z-index: 200;
+    flex-direction: column;
+}
+
+#battle-screen.active {
+    display: flex;
+}
+
+.player-zone {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 1rem;
+}
+
+#opponent-zone {
+    background-color: rgba(0,0,0,0.1);
+}
+
+.hand-container {
+    height: 120px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: -20px; /* Overlap cards */
+}
+
+.bench-container {
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    border: 2px dashed var(--accent-color);
+    margin: 1rem 0;
+    border-radius: 10px;
+}
+
+.player-info {
+    display: flex;
+    justify-content: space-between;
+    padding: 0 2rem;
+    font-size: 1.2em;
+}
+
+#game-info-bar {
+    text-align: center;
+    padding: 0.5rem;
+    background-color: var(--primary-color);
+    color: var(--white-color);
+}
+
+#end-turn-btn {
+    padding: 5px 15px;
+    margin-left: 2rem;
 }

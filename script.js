@@ -53,7 +53,7 @@ const cards = [
     { set_number: 44, name: "Forest Troll", attack: 3, health: 5, rarity: "uncommon", image: "https://via.placeholder.com/200x280.png?text=Forest+Troll" },
     { set_number: 45, name: "Elven Archer", attack: 5, health: 3, rarity: "uncommon", image: "https://via.placeholder.com/200x280.png?text=Elven+Archer" },
     { set_number: 46, name: "Dwarven Warrior", attack: 4, health: 5, rarity: "uncommon", image: "https://via.placeholder.com/200x280.png?text=Dwarven+Warrior" },
-    { set_number: 47, name: "Priestess of Light", attack: 3, health: 6, rarity: "uncommon", image: "https://via.placeholder.com/200x280.png?text=Priestess" },
+    { set_number: 47, name: "Priestess of Light", attack: 3, health: 6, rarity: "uncommon", image: "https://via.placeholder.com/200x280.png?text=Priestess", ability: { type: 'heal', amount: 5, target: 'player' } },
     { set_number: 48, name: "Orc Warlord", attack: 6, health: 4, rarity: "uncommon", image: "https://via.placeholder.com/200x280.png?text=Orc+Warlord" },
     { set_number: 49, name: "Royal Guard", attack: 5, health: 5, rarity: "uncommon", image: "https://via.placeholder.com/200x280.png?text=Royal+Guard" },
     { set_number: 50, name: "Assassin", attack: 7, health: 3, rarity: "uncommon", image: "https://via.placeholder.com/200x280.png?text=Assassin" },
@@ -62,14 +62,14 @@ const cards = [
     { set_number: 53, name: "Minotaur Guardian", attack: 5, health: 7, rarity: "uncommon", image: "https://via.placeholder.com/200x280.png?text=Minotaur" },
     { set_number: 54, name: "Wyvern Rider", attack: 7, health: 4, rarity: "uncommon", image: "https://via.placeholder.com/200x280.png?text=Wyvern+Rider" },
     { set_number: 55, name: "Ice Elemental", attack: 6, health: 6, rarity: "uncommon", image: "https://via.placeholder.com/200x280.png?text=Ice+Elemental" },
-    { set_number: 56, name: "Fire Mage", attack: 8, health: 4, rarity: "uncommon", image: "https://via.placeholder.com/200x280.png?text=Fire+Mage" },
+    { set_number: 56, name: "Fire Mage", attack: 8, health: 4, rarity: "uncommon", image: "https://via.placeholder.com/200x280.png?text=Fire+Mage", ability: { type: 'damage', amount: 3, target: 'opponent' } },
     { set_number: 57, name: "Earth Giant", attack: 4, health: 8, rarity: "uncommon", image: "https://via.placeholder.com/200x280.png?text=Earth+Giant" },
     { set_number: 58, name: "Storm Djinn", attack: 7, health: 5, rarity: "uncommon", image: "https://via.placeholder.com/200x280.png?text=Storm+Djinn" },
     { set_number: 59, "name": "Vampire Lord", "attack": 6, "health": 7, "rarity": "uncommon", "image": "https://via.placeholder.com/200x280.png?text=Vampire+Lord" },
     { set_number: 60, "name": "Werewolf Alpha", "attack": 8, "health": 5, "rarity": "uncommon", "image": "https://via.placeholder.com/200x280.png?text=Werewolf+Alpha" },
     { set_number: 61, "name": "Obsidian Gargoyle", "attack": 5, "health": 8, "rarity": "uncommon", "image": "https://via.placeholder.com/200x280.png?text=Obsidian+Gargoyle" },
     { set_number: 62, "name": "Captain of the Guard", "attack": 6, "health": 6, "rarity": "uncommon", "image": "https://via.placeholder.com/200x280.png?text=Captain" },
-    { set_number: 63, "name": "Master Thief", "attack": 7, "health": 5, "rarity": "uncommon", "image": "https://via.placeholder.com/200x280.png?text=Master+Thief" },
+    { set_number: 63, "name": "Master Thief", "attack": 7, "health": 5, "rarity": "uncommon", "image": "https://via.placeholder.com/200x280.png?text=Master+Thief", "ability": { "type": "draw", "count": 1 } },
     { set_number: 64, "name": "King's Champion", "attack": 8, "health": 6, "rarity": "uncommon", "image": "https://via.placeholder.com/200x280.png?text=King's+Champion" },
     { set_number: 65, "name": "Siege Golem", "attack": 5, "health": 9, "rarity": "uncommon", "image": "https://via.placeholder.com/200x280.png?text=Siege+Golem" },
     { set_number: 66, "name": "High Priest", "attack": 4, "health": 10, "rarity": "uncommon", "image": "https://via.placeholder.com/200x280.png?text=High+Priest" },
@@ -172,9 +172,21 @@ const deckBuilderCollection = document.getElementById('deck-builder-collection')
 const deckBuilderDeck = document.getElementById('deck-builder-deck').querySelector('.card-list');
 const deckCount = document.getElementById('deck-count');
 const saveDeckBtn = document.getElementById('save-deck-btn');
+const battleBtn = document.getElementById('battle-btn');
+const battleScreen = document.getElementById('battle-screen');
 
 let collection = {};
 let deck = [];
+
+// Battle State
+let playerHealth, opponentHealth;
+let playerDeck, opponentDeck;
+let playerHand, opponentHand;
+let playerBench, opponentBench;
+let isPlayerTurn;
+let selectedAttackerIndex = null;
+let playerFatigue = 1;
+let opponentFatigue = 1;
 
 function loadCollection() {
     const savedCollection = localStorage.getItem('cardCollection');
@@ -279,6 +291,7 @@ function displayGallery() {
                 <img class="card-image" src="${card.image}" alt="${card.name}">
                 <div class="card-body">
                     <p>Rarity: ${card.rarity.charAt(0).toUpperCase() + card.rarity.slice(1)}</p>
+                ${card.ability ? `<p class="card-ability">${getAbilityDescription(card.ability)}</p>` : ''}
                 </div>
                 <div class="card-footer">
                     <div class="stats">
@@ -322,6 +335,7 @@ function displayCards(pack, newlyCollected = []) {
             <img class="card-image" src="${card.image}" alt="${card.name}">
             <div class="card-body">
                 <p>Rarity: ${card.rarity.charAt(0).toUpperCase() + card.rarity.slice(1)}</p>
+                ${card.ability ? `<p class="card-ability">${getAbilityDescription(card.ability)}</p>` : ''}
             </div>
             <div class="card-footer">
                 <div class="stats">
@@ -455,3 +469,343 @@ resetYesBtn.addEventListener('click', () => {
     settingsModal.style.display = 'none';
     displayGallery();
 });
+
+function updateBattleUI() {
+    // Update health and deck counts
+    document.getElementById('player-health').textContent = playerHealth;
+    document.getElementById('opponent-health').textContent = opponentHealth;
+    document.getElementById('player-deck-count').textContent = playerDeck.length;
+    document.getElementById('opponent-deck-count').textContent = opponentDeck.length;
+    document.getElementById('turn-indicator').textContent = isPlayerTurn ? "Player's Turn" : "Opponent's Turn";
+
+    // Render player's hand
+    const playerHandContainer = document.querySelector('#player-zone .hand-container');
+    playerHandContainer.innerHTML = '';
+    playerHand.forEach((cardId, index) => {
+        const card = cards.find(c => c.set_number === cardId);
+        const cardElement = document.createElement('div');
+        cardElement.classList.add('card', 'in-hand', card.rarity);
+        cardElement.dataset.handIndex = index;
+        cardElement.innerHTML = `<div class="card-header"><h2>${card.name}</h2></div>`;
+        playerHandContainer.appendChild(cardElement);
+    });
+
+    // Render benches
+    const playerBenchContainer = document.querySelector('#player-zone .bench-container');
+    playerBenchContainer.innerHTML = '';
+    for (let i = 0; i < 3; i++) {
+        const card = playerBench[i];
+        const benchSlot = document.createElement('div');
+        benchSlot.classList.add('bench-slot');
+        if (card) {
+            const cardElement = document.createElement('div');
+            cardElement.classList.add('card', card.rarity);
+            cardElement.innerHTML = `
+                <div class="card-header"><h2>${card.name}</h2></div>
+                <div class="card-footer"><div class="stats"><span>ATK: ${card.attack}</span><span>HP: ${card.health}</span></div></div>
+            `;
+            benchSlot.appendChild(cardElement);
+        }
+        playerBenchContainer.appendChild(benchSlot);
+    }
+
+    const opponentBenchContainer = document.querySelector('#opponent-zone .bench-container');
+    opponentBenchContainer.innerHTML = '';
+    for (let i = 0; i < 3; i++) {
+        const card = opponentBench[i];
+        const benchSlot = document.createElement('div');
+        benchSlot.classList.add('bench-slot');
+        if (card) {
+            const cardElement = document.createElement('div');
+            cardElement.classList.add('card', card.rarity);
+            cardElement.innerHTML = `
+                <div class="card-header"><h2>${card.name}</h2></div>
+                <div class="card-footer"><div class="stats"><span>ATK: ${card.attack}</span><span>HP: ${card.health}</span></div></div>
+            `;
+            benchSlot.appendChild(cardElement);
+        }
+        opponentBenchContainer.appendChild(benchSlot);
+    }
+
+    addBattleEventListeners();
+}
+
+function startBattle() {
+    battleScreen.classList.add('active');
+    playerHealth = 100;
+    opponentHealth = 100;
+
+    // Create shuffled decks
+    playerDeck = [...deck].sort(() => Math.random() - 0.5);
+
+    // Simple AI deck
+    const aiDeckIds = cards.filter(c => c.rarity === 'common').slice(0, 20).map(c => c.set_number);
+    opponentDeck = [...aiDeckIds].sort(() => Math.random() - 0.5);
+
+    // Draw starting hands
+    playerHand = playerDeck.splice(0, 5);
+    opponentHand = opponentDeck.splice(0, 5);
+
+    playerBench = [null, null, null];
+    opponentBench = [null, null, null];
+
+    isPlayerTurn = true;
+    updateBattleUI();
+}
+
+battleBtn.addEventListener('click', () => {
+    if (deck.length < 20) {
+        alert("You need 20 cards in your deck to battle!");
+        return;
+    }
+    startBattle();
+});
+
+function addBattleEventListeners() {
+    // Play card from hand
+    document.querySelectorAll('#player-zone .hand-container .card').forEach(cardElement => {
+        cardElement.addEventListener('click', () => {
+            if (!isPlayerTurn) return;
+            const handIndex = parseInt(cardElement.dataset.handIndex);
+            const emptyBenchSlot = playerBench.findIndex(slot => slot === null);
+            if (emptyBenchSlot !== -1) {
+                const cardId = playerHand.splice(handIndex, 1)[0];
+                const cardData = cards.find(c => c.set_number === cardId);
+                playerBench[emptyBenchSlot] = { ...cardData, currentHealth: cardData.health };
+                triggerAbility(cardData, true);
+                updateBattleUI();
+            } else {
+                alert("Your bench is full!");
+            }
+        });
+    });
+
+    // Select attacker
+    document.querySelectorAll('#player-zone .bench-container .card').forEach((cardElement, index) => {
+        cardElement.addEventListener('click', () => {
+            if (!isPlayerTurn || !playerBench[index]) return;
+            document.querySelectorAll('#player-zone .bench-container .card').forEach(c => c.classList.remove('selected'));
+            cardElement.classList.add('selected');
+            selectedAttackerIndex = index;
+        });
+    });
+
+    // Select target and attack
+    document.querySelectorAll('#opponent-zone .bench-container .card').forEach((cardElement, index) => {
+        cardElement.addEventListener('click', async () => {
+            if (!isPlayerTurn || selectedAttackerIndex === null || !opponentBench[index]) return;
+
+            const attacker = playerBench[selectedAttackerIndex];
+            const target = opponentBench[index];
+            const attackerElement = document.querySelector(`#player-zone .bench-slot:nth-child(${selectedAttackerIndex + 1}) .card`);
+            const targetElement = document.querySelector(`#opponent-zone .bench-slot:nth-child(${index + 1}) .card`);
+
+            await playAnimation(attackerElement, 'attacking');
+            await playAnimation(targetElement, 'damaged', 300);
+
+            target.currentHealth -= attacker.attack;
+
+            if (target.currentHealth <= 0) {
+                await playAnimation(targetElement, 'defeated');
+                opponentBench[index] = null;
+            }
+
+            if (checkGameOver()) return;
+
+            selectedAttackerIndex = null;
+            isPlayerTurn = false;
+            updateBattleUI();
+            setTimeout(aiTurn, 1000);
+        });
+    });
+
+    // Attack opponent directly
+    document.querySelector('#opponent-zone .player-info').addEventListener('click', () => {
+        if (!isPlayerTurn || selectedAttackerIndex === null) return;
+        const opponentBenchIsEmpty = opponentBench.every(card => card === null);
+        if (opponentBenchIsEmpty) {
+            const attacker = playerBench[selectedAttackerIndex];
+            opponentHealth -= attacker.attack;
+
+            if (checkGameOver()) return;
+
+            selectedAttackerIndex = null;
+            isPlayerTurn = false;
+            updateBattleUI();
+            setTimeout(aiTurn, 1000);
+        }
+    });
+
+    // End turn button
+    document.getElementById('end-turn-btn').addEventListener('click', () => {
+        if (isPlayerTurn) {
+            if (playerDeck.length > 0) {
+                playerHand.push(playerDeck.pop());
+            } else {
+                playerHealth -= playerFatigue;
+                playerFatigue++;
+            }
+            if (checkGameOver()) return;
+
+            isPlayerTurn = false;
+            updateBattleUI();
+            setTimeout(aiTurn, 1000);
+        }
+    });
+}
+
+function checkGameOver() {
+    const gameOverModal = document.getElementById('game-over-modal');
+    const gameOverMessage = document.getElementById('game-over-message');
+    const gameOverOkBtn = document.getElementById('game-over-ok-btn');
+
+    let winner = null;
+    if (playerHealth <= 0) winner = 'Opponent';
+    if (opponentHealth <= 0) winner = 'Player';
+
+    if (winner) {
+        gameOverMessage.textContent = `${winner} wins!`;
+        gameOverModal.style.display = 'block';
+        gameOverOkBtn.onclick = () => {
+            gameOverModal.style.display = 'none';
+            battleScreen.classList.remove('active');
+        };
+        return true;
+    }
+    return false;
+}
+
+function triggerAbility(card, isPlayer) {
+    if (!card.ability) return;
+
+    switch (card.ability.type) {
+        case 'heal':
+            if (isPlayer) {
+                playerHealth += card.ability.amount;
+                showFloatingText(`+${card.ability.amount}`, 'heal', document.getElementById('player-health'));
+            } else {
+                opponentHealth += card.ability.amount;
+                showFloatingText(`+${card.ability.amount}`, 'heal', document.getElementById('opponent-health'));
+            }
+            break;
+        case 'damage':
+            if (isPlayer) {
+                opponentHealth -= card.ability.amount;
+                showFloatingText(`-${card.ability.amount}`, 'damage', document.getElementById('opponent-health'));
+            } else {
+                playerHealth -= card.ability.amount;
+                showFloatingText(`-${card.ability.amount}`, 'damage', document.getElementById('player-health'));
+            }
+            break;
+        case 'draw':
+            const deckToDrawFrom = isPlayer ? playerDeck : opponentDeck;
+            const handToDrawTo = isPlayer ? playerHand : opponentHand;
+            for (let i = 0; i < card.ability.count; i++) {
+                if (deckToDrawFrom.length > 0) {
+                    handToDrawTo.push(deckToDrawFrom.pop());
+                }
+            }
+            break;
+    }
+}
+
+function showFloatingText(text, type, targetElement) {
+    const textElement = document.createElement('div');
+    textElement.textContent = text;
+    textElement.className = type === 'damage' ? 'damage-text' : 'heal-text';
+    const rect = targetElement.getBoundingClientRect();
+    textElement.style.position = 'absolute';
+    textElement.style.left = `${rect.left + rect.width / 2 - 20}px`;
+    textElement.style.top = `${rect.top - 30}px`;
+    document.body.appendChild(textElement);
+    setTimeout(() => textElement.remove(), 1000);
+}
+
+function playAnimation(element, animationClass, duration = 500) {
+    return new Promise((resolve) => {
+        if (!element) {
+            resolve();
+            return;
+        }
+        element.classList.add(animationClass);
+        setTimeout(() => {
+            element.classList.remove(animationClass);
+            resolve();
+        }, duration);
+    });
+}
+
+function getAbilityDescription(ability) {
+    switch (ability.type) {
+        case 'heal':
+            return `Heal ${ability.target} for ${ability.amount}.`;
+        case 'damage':
+            return `Deal ${ability.amount} damage to ${ability.target}.`;
+        case 'draw':
+            return `Draw ${ability.count} card(s).`;
+        default:
+            return '';
+    }
+}
+
+function aiTurn() {
+    if (isPlayerTurn) return;
+
+    // 1. Play a card (smarter)
+    opponentHand.sort((a, b) => {
+        const cardA = cards.find(c => c.set_number === a);
+        const cardB = cards.find(c => c.set_number === b);
+        return cardB.attack - cardA.attack;
+    });
+    const cardToPlayId = opponentHand.pop();
+    if (cardToPlayId) {
+        const emptyBenchSlot = opponentBench.findIndex(slot => slot === null);
+        if (emptyBenchSlot !== -1) {
+            const cardData = cards.find(c => c.set_number === cardToPlayId);
+            opponentBench[emptyBenchSlot] = { ...cardData, currentHealth: cardData.health };
+            triggerAbility(cardData, false); // AI uses ability
+        } else {
+            opponentHand.push(cardToPlayId);
+        }
+    }
+
+    // 2. Attack (smarter)
+    const availableAiCards = opponentBench.map((card, index) => ({ card, index })).filter(item => item.card !== null);
+    let availablePlayerCards = playerBench.map((card, index) => ({ card, index })).filter(item => item.card !== null);
+
+    if (availableAiCards.length > 0) {
+        availableAiCards.sort((a, b) => b.card.attack - a.card.attack);
+        const attacker = availableAiCards[0];
+
+        if (availablePlayerCards.length > 0) {
+            availablePlayerCards.sort((a, b) => {
+                if (b.card.attack !== a.card.attack) {
+                    return b.card.attack - a.card.attack;
+                }
+                return a.card.currentHealth - b.card.currentHealth;
+            });
+            const target = availablePlayerCards[0];
+
+            target.card.currentHealth -= attacker.card.attack;
+            if (target.card.currentHealth <= 0) {
+                playerBench[target.index] = null;
+            }
+        } else {
+            playerHealth -= attacker.card.attack;
+        }
+    }
+
+    // 3. Draw a card
+    if (opponentDeck.length > 0) {
+        opponentHand.push(opponentDeck.pop());
+    } else {
+        opponentHealth -= opponentFatigue;
+        opponentFatigue++;
+    }
+
+    if (checkGameOver()) return;
+
+    // 4. End AI turn
+    isPlayerTurn = true;
+    updateBattleUI();
+}
