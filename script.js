@@ -21,6 +21,20 @@ const cards = [
         rarity: "common",
         image: "https://via.placeholder.com/200x280.png?text=Rat"
     },
+    {
+        name: "Skeleton",
+        attack: 2,
+        health: 1,
+        rarity: "common",
+        image: "https://via.placeholder.com/200x280.png?text=Skeleton"
+    },
+    {
+        name: "Bat",
+        attack: 1,
+        health: 1,
+        rarity: "common",
+        image: "https://via.placeholder.com/200x280.png?text=Bat"
+    },
     // Uncommon Cards
     {
         name: "Orc",
@@ -35,6 +49,20 @@ const cards = [
         health: 3,
         rarity: "uncommon",
         image: "https://via.placeholder.com/200x280.png?text=Knight"
+    },
+    {
+        name: "Elf Archer",
+        attack: 3,
+        health: 2,
+        rarity: "uncommon",
+        image: "https://via.placeholder.com/200x280.png?text=Elf+Archer"
+    },
+    {
+        name: "Dwarf Warrior",
+        attack: 2,
+        health: 4,
+        rarity: "uncommon",
+        image: "https://via.placeholder.com/200x280.png?text=Dwarf+Warrior"
     },
     // Rare Cards
     {
@@ -51,6 +79,20 @@ const cards = [
         rarity: "rare",
         image: "https://via.placeholder.com/200x280.png?text=Dragon"
     },
+    {
+        name: "Griffin",
+        attack: 6,
+        health: 6,
+        rarity: "rare",
+        image: "https://via.placeholder.com/200x280.png?text=Griffin"
+    },
+    {
+        name: "Hydra",
+        attack: 8,
+        health: 4,
+        rarity: "rare",
+        image: "https://via.placeholder.com/200x280.png?text=Hydra"
+    },
     // Legendary Card
     {
         name: "Phoenix",
@@ -58,6 +100,13 @@ const cards = [
         health: 7,
         rarity: "legendary",
         image: "https://via.placeholder.com/200x280.png?text=Phoenix"
+    },
+    {
+        name: "Archangel",
+        attack: 8,
+        health: 8,
+        rarity: "legendary",
+        image: "https://via.placeholder.com/200x280.png?text=Archangel"
     }
 ];
 
@@ -95,21 +144,29 @@ function openPack() {
     return pack;
 }
 
-const openPackBtn = document.getElementById('open-pack-btn');
+const packOpener = document.getElementById('pack-opener');
 const cardContainer = document.getElementById('card-container');
 
 function displayCards(pack) {
     cardContainer.innerHTML = '';
-    pack.forEach(card => {
+    pack.forEach((card, index) => {
         const cardElement = document.createElement('div');
         cardElement.classList.add('card', card.rarity);
+        cardElement.style.animationDelay = `${index * 0.1}s`;
 
         cardElement.innerHTML = `
-            <img src="${card.image}" alt="${card.name}">
-            <h2>${card.name}</h2>
-            <div class="stats">
-                <span>ATK: ${card.attack}</span>
-                <span>HP: ${card.health}</span>
+            <div class="card-header">
+                <h2>${card.name}</h2>
+            </div>
+            <img class="card-image" src="${card.image}" alt="${card.name}">
+            <div class="card-body">
+                <p>Rarity: ${card.rarity.charAt(0).toUpperCase() + card.rarity.slice(1)}</p>
+            </div>
+            <div class="card-footer">
+                <div class="stats">
+                    <span>ATK: ${card.attack}</span>
+                    <span>HP: ${card.health}</span>
+                </div>
             </div>
         `;
 
@@ -117,7 +174,12 @@ function displayCards(pack) {
     });
 }
 
-openPackBtn.addEventListener('click', () => {
+packOpener.addEventListener('click', () => {
+    packOpener.classList.add('opening');
     const newPack = openPack();
-    displayCards(newPack);
+
+    setTimeout(() => {
+        displayCards(newPack);
+        packOpener.style.display = 'none'; // Hide the pack after opening
+    }, 1000); // Wait for pack animation to finish
 });
