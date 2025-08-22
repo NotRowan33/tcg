@@ -101,13 +101,24 @@ const gallery = document.getElementById('gallery');
 const collectionModal = document.getElementById('collection-modal');
 const openCollectionBtn = document.getElementById('open-collection-btn');
 const closeBtn = document.querySelector('.close-btn');
+const settingsModal = document.getElementById('settings-modal');
+const settingsBtn = document.getElementById('settings-btn');
+const closeSettingsBtn = settingsModal.querySelector('.close-btn');
+const themeSwitcher = document.getElementById('theme-switcher');
+const themeButtons = themeSwitcher.querySelectorAll('.theme-btn');
+const resetBtn = document.getElementById('reset-btn');
+const resetConfirmation = document.getElementById('reset-confirmation');
+const resetYesBtn = document.getElementById('reset-yes-btn');
+const resetNoBtn = document.getElementById('reset-no-btn');
 
-let collection = [];
+let collection = {};
 
 function loadCollection() {
     const savedCollection = localStorage.getItem('cardCollection');
     if (savedCollection) {
         collection = JSON.parse(savedCollection);
+    } else {
+        collection = {};
     }
 }
 
@@ -118,10 +129,12 @@ function saveCollection() {
 function addToCollection(pack) {
     const newlyAdded = [];
     pack.forEach(card => {
-        if (!collection.find(c => c.set_number === card.set_number)) {
-            collection.push(card);
+        const setNum = card.set_number;
+        if (!collection[setNum]) {
+            collection[setNum] = 0;
             newlyAdded.push(card);
         }
+        collection[setNum]++;
     });
     saveCollection();
     return newlyAdded;
@@ -130,12 +143,13 @@ function addToCollection(pack) {
 function displayGallery() {
     gallery.innerHTML = '';
     cards.forEach(card => {
-        const collectedCard = collection.find(c => c.set_number === card.set_number);
+        const quantity = collection[card.set_number] || 0;
         const cardElement = document.createElement('div');
 
-        if (collectedCard) {
+        if (quantity > 0) {
             cardElement.classList.add('card', card.rarity);
             cardElement.innerHTML = `
+                <div class="quantity-tag">x${quantity}</div>
                 <div class="card-header">
                     <h2>${card.name}</h2>
                 </div>
@@ -233,4 +247,55 @@ window.addEventListener('click', (event) => {
     if (event.target == collectionModal) {
         collectionModal.style.display = 'none';
     }
+    if (event.target == settingsModal) {
+        settingsModal.style.display = 'none';
+    }
+});
+
+settingsBtn.addEventListener('click', () => {
+    settingsModal.style.display = 'block';
+});
+
+closeSettingsBtn.addEventListener('click', () => {
+    settingsModal.style.display = 'none';
+});
+
+function applyTheme(theme) {
+    document.body.className = '';
+    if (theme !== 'green') {
+        document.body.classList.add(`theme-${theme}`);
+    }
+    localStorage.setItem('theme', theme);
+}
+
+themeButtons.forEach(button => {
+    button.addEventListener('click', () => {
+        const theme = button.dataset.theme;
+        applyTheme(theme);
+    });
+});
+
+function loadTheme() {
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme) {
+        applyTheme(savedTheme);
+    }
+}
+
+loadTheme();
+
+resetBtn.addEventListener('click', () => {
+    resetConfirmation.classList.remove('hidden');
+});
+
+resetNoBtn.addEventListener('click', () => {
+    resetConfirmation.classList.add('hidden');
+});
+
+resetYesBtn.addEventListener('click', () => {
+    localStorage.removeItem('cardCollection');
+    collection = {};
+    resetConfirmation.classList.add('hidden');
+    settingsModal.style.display = 'none';
+    displayGallery();
 });

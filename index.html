@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <button id="settings-btn">⚙️</button>
     <h1>Trading Card Game</h1>
     <div id="pack-opener" class="pack">
         <div class="pack-front">
@@ -14,13 +15,34 @@
         </div>
     </div>
     <div id="card-container"></div>
-    <button id="open-another-pack-btn">Open Another Pack</button>
+    <button id="open-another-pack-btn">Return to Menu</button>
     <button id="open-collection-btn">My Collection</button>
     <div id="collection-modal" class="modal">
         <div class="modal-content">
             <span class="close-btn">&times;</span>
             <h2>My Collection</h2>
             <div id="gallery"></div>
+        </div>
+    </div>
+    <div id="settings-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn">&times;</span>
+            <h2>Settings</h2>
+            <div id="theme-switcher">
+                <h3>Color Theme</h3>
+                <button class="theme-btn" data-theme="green">Green</button>
+                <button class="theme-btn" data-theme="blue">Blue</button>
+                <button class="theme-btn" data-theme="red">Red</button>
+            </div>
+            <div id="reset-progress">
+                <h3>Reset Progress</h3>
+                <button id="reset-btn" class="danger-btn">Reset</button>
+                <div id="reset-confirmation" class="hidden">
+                    <p>Are you sure you want to reset all your progress?</p>
+                    <button id="reset-yes-btn" class="danger-btn">Yes</button>
+                    <button id="reset-no-btn">No</button>
+                </div>
+            </div>
         </div>
     </div>
     <script src="script.js"></script>
