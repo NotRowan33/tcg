@@ -1023,22 +1023,29 @@ function displayCards(pack, newlyCollected = []) {
 }
 
 function displayPackSelection() {
-    packSelectionContainer.innerHTML = '';
+    packSelectionContainer.innerHTML = '<h2>Choose Your Pack</h2>';
+    const packList = document.createElement('div');
+    packList.className = 'pack-list';
+
     for (const theme in cardSets) {
         const packElement = document.createElement('div');
-        packElement.classList.add('pack');
+        packElement.className = 'pack-item';
         packElement.dataset.packTheme = theme;
+
+        // Add a class for specific pack styling
+        packElement.classList.add(`pack-item--${theme}`);
+
         packElement.innerHTML = `
-            <div class="pack-front">
-                <p>${theme.charAt(0).toUpperCase() + theme.slice(1)} Pack</p>
-            </div>
+            <div class="pack-item-art"></div>
+            <div class="pack-item-title">${theme.charAt(0).toUpperCase() + theme.slice(1)}</div>
         `;
-        packSelectionContainer.appendChild(packElement);
+        packList.appendChild(packElement);
     }
+    packSelectionContainer.appendChild(packList);
 }
 
 packSelectionContainer.addEventListener('click', (event) => {
-    const packElement = event.target.closest('.pack');
+    const packElement = event.target.closest('.pack-item');
     if (!packElement) return;
 
     const packTheme = packElement.dataset.packTheme;
@@ -1372,8 +1379,10 @@ function addBattleEventListeners() {
         if (opponentBenchIsEmpty) {
             const attacker = playerBench[selectedAttackerIndex];
             const attackerElement = document.querySelector(`#player-zone .bench-slot:nth-child(${selectedAttackerIndex + 1}) .card`);
+            const opponentInfo = document.querySelector('#opponent-zone .player-info');
             await playAnimation(attackerElement, 'attacking');
             opponentHealth -= attacker.attack;
+            await playAnimation(opponentInfo, 'damaged');
 
             if (checkGameOver()) return;
 
@@ -1445,9 +1454,11 @@ function triggerAbility(card, isPlayer) {
             if (isPlayer) {
                 opponentHealth -= card.ability.amount;
                 showFloatingText(`-${card.ability.amount}`, 'damage', document.getElementById('opponent-health'));
+                playAnimation(document.querySelector('#opponent-zone .player-info'), 'damaged');
             } else {
                 playerHealth -= card.ability.amount;
                 showFloatingText(`-${card.ability.amount}`, 'damage', document.getElementById('player-health'));
+                playAnimation(document.querySelector('#player-zone .player-info'), 'damaged');
             }
             break;
         case 'draw':
@@ -1544,7 +1555,9 @@ function aiTurn() {
                 playerBench[target.index] = null;
             }
         } else {
+            const playerInfo = document.querySelector('#player-zone .player-info');
             playerHealth -= attacker.card.attack;
+            playAnimation(playerInfo, 'damaged');
         }
     }
 

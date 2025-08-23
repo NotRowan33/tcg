@@ -11,17 +11,19 @@
     <h1>Trading Card Game</h1>
     <div id="pack-selection-container"></div>
     <div id="card-container"></div>
-    <button id="open-another-pack-btn">Return to Menu</button>
-    <button id="open-collection-btn">My Collection</button>
-    <button id="deck-builder-btn">Deck Builder</button>
-    <button id="battle-btn">Battle!</button>
+    <button id="open-another-pack-btn" class="btn btn-primary">Return to Menu</button>
+    <button id="open-collection-btn" class="btn btn-primary">My Collection</button>
+    <button id="deck-builder-btn" class="btn btn-primary">Deck Builder</button>
+    <button id="battle-btn" class="btn btn-primary">Battle!</button>
     <div id="collection-modal" class="modal">
         <div class="modal-content">
             <span class="close-btn">&times;</span>
-            <h2>My Collection</h2>
-            <div class="filter-container">
-                <label for="collection-set-filter">Filter by Set:</label>
-                <select id="collection-set-filter"></select>
+            <div class="modal-header">
+                <h2>My Collection</h2>
+                <div class="filter-container">
+                    <label for="collection-set-filter">Filter by Set:</label>
+                    <select id="collection-set-filter"></select>
+                </div>
             </div>
             <div id="gallery"></div>
         </div>
@@ -30,19 +32,21 @@
         <div class="modal-content">
             <span class="close-btn">&times;</span>
             <h2>Settings</h2>
-            <div id="theme-switcher">
-                <h3>Color Theme</h3>
-                <button class="theme-btn" data-theme="green">Green</button>
-                <button class="theme-btn" data-theme="blue">Blue</button>
-                <button class="theme-btn" data-theme="red">Red</button>
-            </div>
-            <div id="reset-progress">
-                <h3>Reset Progress</h3>
-                <button id="reset-btn" class="danger-btn">Reset</button>
-                <div id="reset-confirmation" class="hidden">
-                    <p>Are you sure you want to reset all your progress?</p>
-                    <button id="reset-yes-btn" class="danger-btn">Yes</button>
-                    <button id="reset-no-btn">No</button>
+            <div class="settings-container">
+                <div id="theme-switcher" class="settings-section">
+                    <h3>Color Theme</h3>
+                    <button class="theme-btn btn btn-secondary" data-theme="green">Green</button>
+                    <button class="theme-btn btn btn-secondary" data-theme="blue">Blue</button>
+                    <button class="theme-btn btn btn-secondary" data-theme="red">Red</button>
+                </div>
+                <div id="reset-progress" class="settings-section">
+                    <h3>Reset Progress</h3>
+                    <button id="reset-btn" class="btn btn-danger">Reset</button>
+                    <div id="reset-confirmation" class="hidden">
+                        <p>Are you sure?</p>
+                        <button id="reset-yes-btn" class="btn btn-danger">Yes</button>
+                        <button id="reset-no-btn" class="btn btn-secondary">No</button>
+                    </div>
                 </div>
             </div>
             <div id="secret-unlock-area">
@@ -53,7 +57,9 @@
     <div id="deck-builder-modal" class="modal">
         <div class="modal-content">
             <span class="close-btn">&times;</span>
-            <h2>Deck Builder</h2>
+            <div class="modal-header">
+                <h2>Deck Builder</h2>
+            </div>
             <div class="deck-builder-container">
                 <div id="deck-builder-collection" class="deck-panel">
                     <div class="deck-panel-header">
@@ -66,11 +72,13 @@
                     <div class="card-list"></div>
                 </div>
                 <div id="deck-builder-deck" class="deck-panel">
-                    <h3>Your Deck (<span id="deck-count">0</span>/20)</h3>
+                    <div class="deck-panel-header">
+                        <h3>Your Deck (<span id="deck-count">0</span>/20)</h3>
+                    </div>
                     <div class="card-list"></div>
                 </div>
             </div>
-            <button id="save-deck-btn">Save Deck</button>
+            <button id="save-deck-btn" class="btn btn-primary">Save Deck</button>
         </div>
     </div>
     <div id="battle-screen">
@@ -85,7 +93,7 @@
 
         <div id="game-info-bar">
             <span id="turn-indicator">Player's Turn</span>
-            <button id="end-turn-btn">End Turn</button>
+            <button id="end-turn-btn" class="btn btn-secondary">End Turn</button>
         </div>
 
         <div id="player-zone" class="player-zone">
@@ -100,7 +108,7 @@
     <div id="game-over-modal" class="modal">
         <div class="modal-content">
             <h2 id="game-over-message"></h2>
-            <button id="game-over-ok-btn">OK</button>
+            <button id="game-over-ok-btn" class="btn btn-primary">OK</button>
         </div>
     </div>
     <script src="script.js"></script>
