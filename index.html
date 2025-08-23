@@ -9,11 +9,7 @@
 <body>
     <button id="settings-btn">⚙️</button>
     <h1>Trading Card Game</h1>
-    <div id="pack-opener" class="pack">
-        <div class="pack-front">
-            <p>Click to Open</p>
-        </div>
-    </div>
+    <div id="pack-selection-container"></div>
     <div id="card-container"></div>
     <button id="open-another-pack-btn">Return to Menu</button>
     <button id="open-collection-btn">My Collection</button>
@@ -23,6 +19,10 @@
         <div class="modal-content">
             <span class="close-btn">&times;</span>
             <h2>My Collection</h2>
+            <div class="filter-container">
+                <label for="collection-set-filter">Filter by Set:</label>
+                <select id="collection-set-filter"></select>
+            </div>
             <div id="gallery"></div>
         </div>
     </div>
@@ -53,7 +53,13 @@
             <h2>Deck Builder</h2>
             <div class="deck-builder-container">
                 <div id="deck-builder-collection" class="deck-panel">
-                    <h3>Your Collection</h3>
+                    <div class="deck-panel-header">
+                        <h3>Your Collection</h3>
+                        <div class="filter-container">
+                            <label for="deck-builder-set-filter">Filter:</label>
+                            <select id="deck-builder-set-filter"></select>
+                        </div>
+                    </div>
                     <div class="card-list"></div>
                 </div>
                 <div id="deck-builder-deck" class="deck-panel">
